@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const { data } = await authService.login(credentials);
+      const data = await authService.login(credentials);
       const authToken = data.token;
       localStorage.setItem('leathric_token', authToken);
       localStorage.setItem('leathric_user', JSON.stringify(data.user));
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
   const signup = async (payload) => {
     setLoading(true);
     try {
-      const { data } = await authService.register(payload);
+      const data = await authService.register(payload);
       return data;
     } finally {
       setLoading(false);

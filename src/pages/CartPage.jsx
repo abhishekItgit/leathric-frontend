@@ -21,7 +21,7 @@ export function CartPage() {
       <div className="space-y-4">
         {cartItems.map((item) => (
           <div key={item.id} className="panel flex items-center gap-4 p-4">
-            <img src={item.image} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
+            <img src={item.imageUrl} alt={item.name} className="h-20 w-20 rounded-xl object-cover" />
             <div className="flex-1">
               <h3 className="font-semibold">{item.name}</h3>
               <p className="text-sm text-stone-300">${item.price}</p>

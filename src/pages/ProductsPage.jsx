@@ -3,43 +3,28 @@ import { ProductCard } from '../components/ProductCard';
 import { Input } from '../components/Input';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ErrorState } from '../components/ErrorState';
-import { productService } from '../services/productService';
-import { mockProducts } from './mockData';
 import { useCart } from '../hooks/useCart';
+import { useProducts } from '../hooks/useProducts';
 
 const pageSize = 6;
 
 export function ProductsPage() {
   const { addToCart } = useCart();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { products, categories, loading, error, refetch } = useProducts();
   const [category, setCategory] = useState('All');
   const [priceLimit, setPriceLimit] = useState('600');
   const [sortBy, setSortBy] = useState('featured');
   const [page, setPage] = useState(1);
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const { data } = await productService.getProducts();
-      setProducts(data.products || data || mockProducts);
-    } catch {
-      setProducts(mockProducts);
-      setError('Live API unavailable. Showing curated catalog preview.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const categoryOptions = useMemo(() => ['All', ...categories], [categories]);
 
   const filteredProducts = useMemo(() => {
     let output = [...products];
-    if (category !== 'All') output = output.filter((item) => item.category === category);
+
+    if (category !== 'All') {
+      output = output.filter((item) => item.category === category);
+    }
+
     output = output.filter((item) => Number(item.price) <= Number(priceLimit));
 
     if (sortBy === 'priceAsc') output.sort((a, b) => a.price - b.price);
@@ -64,7 +49,7 @@ export function ProductsPage() {
         <label className="space-y-2 text-sm">
           <span>Category</span>
           <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-white/10 bg-white/5 p-2.5">
-            {['All', 'Bags', 'Wallets', 'Apparel', 'Accessories'].map((item) => (
+            {categoryOptions.map((item) => (
               <option key={item} value={item} className="bg-leather-900">
                 {item}
               </option>
@@ -83,7 +68,7 @@ export function ProductsPage() {
         </label>
       </div>
 
-      {error && <ErrorState message={error} onRetry={fetchProducts} />}
+      {error && <ErrorState message={error} onRetry={refetch} />}
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,11 +78,15 @@ export function ProductsPage() {
         </div>
       ) : (
         <>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {paginated.map((product) => (
-              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
-            ))}
-          </div>
+          {!paginated.length ? (
+            <div className="panel p-8 text-center text-stone-300">No products matched your filters.</div>
+          ) : (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {paginated.map((product) => (
+                <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+              ))}
+            </div>
+          )}
           <div className="flex justify-center gap-2">
             <button disabled={page === 1} onClick={() => setPage((value) => value - 1)} className="rounded-xl border border-white/20 px-3 py-2 text-sm disabled:opacity-40">Prev</button>
             <span className="rounded-xl border border-white/20 px-3 py-2 text-sm">

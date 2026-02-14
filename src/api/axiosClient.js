@@ -11,9 +11,11 @@ export const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('leathric_token');
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
@@ -22,7 +24,9 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('leathric_token');
+      localStorage.removeItem('leathric_user');
     }
+
     return Promise.reject(error);
   }
 );

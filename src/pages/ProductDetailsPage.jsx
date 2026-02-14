@@ -1,43 +1,26 @@
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
-import { productService } from '../services/productService';
-import { mockProducts } from './mockData';
+import { ErrorState } from '../components/ErrorState';
 import { useCart } from '../hooks/useCart';
+import { useProduct } from '../hooks/useProducts';
 
 export function ProductDetailsPage() {
   const { id } = useParams();
   const { addToCart } = useCart();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadProduct() {
-      setLoading(true);
-      try {
-        const { data } = await productService.getProductById(id);
-        setProduct(data.product || data);
-      } catch {
-        setProduct(mockProducts.find((item) => String(item.id) === id));
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProduct();
-  }, [id]);
+  const { product, loading, error, refetch } = useProduct(id);
 
   if (loading) return <LoadingSkeleton className="h-[460px]" />;
+  if (error) return <ErrorState message={error} onRetry={refetch} />;
   if (!product) return <p>Product not found.</p>;
 
   return (
     <section className="grid gap-8 lg:grid-cols-2">
       <div className="space-y-4">
-        <img src={product.image} alt={product.name} className="h-[420px] w-full rounded-2xl object-cover" />
+        <img src={product.imageUrl} alt={product.name} className="h-[420px] w-full rounded-2xl object-cover" />
         <div className="grid grid-cols-3 gap-3">
           {[1, 2, 3].map((index) => (
-            <img key={index} src={product.image} alt={`${product.name} preview ${index}`} className="h-24 w-full rounded-xl object-cover opacity-70" />
+            <img key={index} src={product.imageUrl} alt={`${product.name} preview ${index}`} className="h-24 w-full rounded-xl object-cover opacity-70" />
           ))}
         </div>
       </div>
