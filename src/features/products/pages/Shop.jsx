@@ -20,7 +20,7 @@ export function Shop() {
 
   const filteredProducts = useMemo(() => {
     const filtered = products.filter((item) => {
-      const categoryMatch = category === 'All' || item.category === category;
+      const categoryMatch = category === 'All' || item.categoryName === category;
       const priceMatch = Number(item.price) <= Number(priceLimit);
       return categoryMatch && priceMatch;
     });
