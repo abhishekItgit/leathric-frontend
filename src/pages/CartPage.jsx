@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { useCart } from '../hooks/useCart';
+import { useCart } from '../features/cart/hooks/useCart';
 
 export function CartPage() {
-  const { cartItems, cartTotal, updateQuantity, removeItem } = useCart();
+  const { cartItems, cartTotal, updateQuantity, removeItem, loading, error } = useCart();
+
+  if (loading) {
+    return <div className="panel p-10 text-center">Loading cart...</div>;
+  }
+
+  if (error) {
+    return <div className="panel p-10 text-center text-red-300">{error}</div>;
+  }
 
   if (!cartItems.length) {
     return (

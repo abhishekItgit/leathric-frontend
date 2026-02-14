@@ -1,24 +1,21 @@
 import { createContext, useMemo, useState } from 'react';
-import { authService } from '../services/authService';
+import { authApi } from '../features/auth/api/authApi';
+import { authToken } from '../lib/authToken';
 
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('leathric_token'));
-  const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('leathric_user');
-    return raw ? JSON.parse(raw) : null;
-  });
+  const [token, setToken] = useState(() => authToken.getToken());
+  const [user, setUser] = useState(() => authToken.getUser());
   const [loading, setLoading] = useState(false);
 
   const login = async (credentials) => {
     setLoading(true);
     try {
-      const data = await authService.login(credentials);
-      const authToken = data.token;
-      localStorage.setItem('leathric_token', authToken);
-      localStorage.setItem('leathric_user', JSON.stringify(data.user));
-      setToken(authToken);
+      const data = await authApi.login(credentials);
+      authToken.setToken(data.token, { persist: true });
+      authToken.setUser(data.user, { persist: true });
+      setToken(data.token);
       setUser(data.user);
       return data;
     } finally {
@@ -29,16 +26,15 @@ export function AuthProvider({ children }) {
   const signup = async (payload) => {
     setLoading(true);
     try {
-      const data = await authService.register(payload);
-      return data;
+      return await authApi.register(payload);
     } finally {
       setLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('leathric_token');
-    localStorage.removeItem('leathric_user');
+    authToken.clearToken();
+    authToken.clearUser();
     setToken(null);
     setUser(null);
   };

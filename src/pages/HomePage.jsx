@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
-import { ProductCard } from '../components/ProductCard';
-import { useCart } from '../hooks/useCart';
-import { useProducts } from '../hooks/useProducts';
+import { ProductCard } from '../features/products/components/ProductCard';
+import { useCart } from '../features/cart/hooks/useCart';
+import { useProducts } from '../features/products/hooks/useProducts';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ErrorState } from '../components/ErrorState';
 
@@ -30,6 +30,7 @@ export function HomePage() {
           className="h-80 w-full rounded-2xl object-cover shadow-premium"
           src="https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?auto=format&fit=crop&w=1200&q=80"
           alt="Leathric premium collection"
+          loading="lazy"
         />
       </section>
 
