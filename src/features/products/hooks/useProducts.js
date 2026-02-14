@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { productApi } from '../api/productApi';
+import { axiosClient } from '../../../lib/axiosClient';
 
 export function useProducts(params) {
   const [products, setProducts] = useState([]);
@@ -14,12 +15,27 @@ export function useProducts(params) {
     setError('');
 
     try {
-      const [productData, categoryData] = await Promise.all([
-        productApi.getProducts(queryParams),
+      const [response, categoryData] = await Promise.all([
+        axiosClient.get('/products', { params: queryParams }),
         productApi.getCategories(),
       ]);
 
-      setProducts(productData);
+      console.log('API RESPONSE:', response.data);
+      const products = response?.data?.data?.content || [];
+      console.log('PRODUCT ARRAY:', products);
+
+      const normalizedProducts = Array.isArray(products)
+        ? products.map((product) => ({
+            ...product,
+            categoryName:
+              product?.categoryName ||
+              (typeof product?.category === 'string'
+                ? product.category
+                : product?.category?.name || product?.category?.title || ''),
+          }))
+        : [];
+
+      setProducts(normalizedProducts);
       setCategories(categoryData);
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to load products right now.');
