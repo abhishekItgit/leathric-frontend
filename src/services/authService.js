@@ -1,6 +1,6 @@
-import { axiosClient } from './axiosClient';
+import { authApi } from '../api/authApi';
 
 export const authService = {
-  login: (payload) => axiosClient.post('/auth/login', payload),
-  register: (payload) => axiosClient.post('/auth/register', payload),
+  login: (payload) => authApi.login(payload),
+  register: (payload) => authApi.register(payload),
 };

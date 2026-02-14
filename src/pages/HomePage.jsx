@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { ProductCard } from '../components/ProductCard';
 import { useCart } from '../hooks/useCart';
-import { mockProducts } from './mockData';
-
-const categories = ['Bags', 'Wallets', 'Apparel', 'Accessories'];
+import { useProducts } from '../hooks/useProducts';
+import { LoadingSkeleton } from '../components/LoadingSkeleton';
+import { ErrorState } from '../components/ErrorState';
 
 export function HomePage() {
   const { addToCart } = useCart();
+  const { products, categories, loading, error, refetch } = useProducts();
 
   return (
     <div className="space-y-16">
@@ -39,11 +40,22 @@ export function HomePage() {
             View all
           </Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {mockProducts.slice(0, 3).map((product) => (
-            <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
-          ))}
-        </div>
+
+        {error && <ErrorState message={error} onRetry={refetch} />}
+
+        {loading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <LoadingSkeleton key={index} className="h-[360px]" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {products.slice(0, 3).map((product) => (
+              <ProductCard key={product.id} product={product} onAddToCart={addToCart} />
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

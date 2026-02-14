@@ -3,15 +3,23 @@ import { cartService } from '../services/cartService';
 
 export const CartContext = createContext(null);
 
+const mapCartItem = (item) => ({
+  ...item,
+  id: item.id || item.productId,
+  imageUrl: item.imageUrl || item.image || item.product?.imageUrl || '',
+  name: item.name || item.product?.name,
+  price: item.price || item.product?.price || 0,
+});
+
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
 
   const fetchCart = async () => {
     try {
       const { data } = await cartService.getCart();
-      setCartItems(data.items || []);
+      setCartItems((data.items || []).map(mapCartItem));
     } catch {
-      // noop for unauthenticated visitors
+      setCartItems([]);
     }
   };
 
@@ -20,40 +28,23 @@ export function CartProvider({ children }) {
   }, []);
 
   const addToCart = async (product) => {
-    const existing = cartItems.find((item) => item.id === product.id);
-    if (existing) {
-      return updateQuantity(product.id, existing.quantity + 1);
-    }
-
-    setCartItems((prev) => [...prev, { ...product, quantity: 1 }]);
-    try {
-      await cartService.addToCart({ productId: product.id, quantity: 1 });
-    } catch {
-      // fallback to optimistic state
-    }
+    await cartService.addToCart({ productId: product.id, quantity: 1 });
+    await fetchCart();
   };
 
   const updateQuantity = async (id, quantity) => {
     if (quantity < 1) return;
-    setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, quantity } : item)));
-    try {
-      await cartService.updateItem(id, { quantity });
-    } catch {
-      // keep UX snappy even when backend unavailable
-    }
+    await cartService.updateItem(id, { quantity });
+    await fetchCart();
   };
 
   const removeItem = async (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
-    try {
-      await cartService.removeItem(id);
-    } catch {
-      // ignore API failure for demo UX
-    }
+    await cartService.removeItem(id);
+    await fetchCart();
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const cartTotal = cartItems.reduce((total, item) => total + Number(item.price) * item.quantity, 0);
 
   const value = useMemo(
     () => ({ cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeItem, fetchCart }),

@@ -7,7 +7,7 @@ export function ProductCard({ product, onAddToCart }) {
     <Card className="group flex flex-col">
       <div className="relative overflow-hidden">
         <img
-          src={product.image}
+          src={product.imageUrl}
           alt={product.name}
           className="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
         />
