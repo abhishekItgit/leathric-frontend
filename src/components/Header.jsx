@@ -60,9 +60,9 @@ export function Header() {
               <span className="absolute -right-2 -top-2 rounded-full bg-[#C8A36A] px-1.5 text-[10px] font-bold text-black">{cartCount}</span>
             ) : null}
           </Link>
-          {isAuthenticated() ? (
+          {isAuthenticated ? (
             <button onClick={handleLogout} className="rounded-full border border-white/20 px-4 py-2 text-sm text-stone-200 hover:border-[#C8A36A] hover:text-white">
-              {user?.name ? `${user.name.split(' ')[0]} · Logout` : 'Profile · Logout'}
+              {user?.fullName ? `${user.fullName.split(' ')[0]} · Logout` : 'Profile · Logout'}
             </button>
           ) : (
             <Link to="/signin" className="rounded-full bg-[#C8A36A] px-4 py-2 text-sm font-semibold text-black">Sign In</Link>

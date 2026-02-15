@@ -9,8 +9,9 @@ export function ProtectedRoute({ children }) {
     return null;
   }
 
-  if (!isAuthenticated()) {
-    return <Navigate to="/signin" replace state={{ from: location }} />;
+  if (!isAuthenticated) {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`/signin?redirect=${redirect}`} replace />;
   }
 
   return children;

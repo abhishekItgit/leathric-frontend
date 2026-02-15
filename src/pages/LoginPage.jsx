@@ -10,7 +10,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loading } = useAuth();
-  const { fetchCart } = useCart();
+  const { refreshCart } = useCart();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
@@ -20,7 +20,7 @@ export function LoginPage() {
 
     try {
       await login(form);
-      await fetchCart();
+      await refreshCart();
       const redirect = new URLSearchParams(location.search).get('redirect');
       navigate(redirect || '/');
     } catch (err) {

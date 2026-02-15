@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { authToken } from './authToken';
+import { authStorage } from '../services/authStorage';
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -13,10 +13,15 @@ export const axiosClient = axios.create({
 
 const isBrowser = typeof window !== 'undefined';
 
-function redirectToSignIn() {
+function clearSessionAndRedirect() {
+  authStorage.removeToken();
+  authStorage.removeUser();
+
   if (!isBrowser) {
     return;
   }
+
+  window.dispatchEvent(new Event('auth:logout'));
 
   const { pathname, search } = window.location;
   const currentPath = `${pathname}${search}`;
@@ -30,7 +35,7 @@ function redirectToSignIn() {
 
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = authToken.getToken();
+    const token = authStorage.getToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -45,12 +50,7 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      authToken.clearToken();
-      authToken.clearUser();
-      if (isBrowser) {
-        window.dispatchEvent(new Event('auth:logout'));
-      }
-      redirectToSignIn();
+      clearSessionAndRedirect();
     }
 
     return Promise.reject(error);

@@ -9,17 +9,17 @@ import { useAuth } from '../hooks/useAuth';
 export function ProductDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addItem } = useCart();
   const { isAuthenticated } = useAuth();
   const { product, loading, error, refetch } = useProduct(id);
 
   const handleAddToCart = async () => {
-    if (!isAuthenticated()) {
+    if (!isAuthenticated) {
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
 
-    await addToCart(product);
+    await addItem(product);
     navigate('/cart');
   };
 
