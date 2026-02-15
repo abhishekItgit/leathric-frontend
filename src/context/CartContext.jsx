@@ -1,6 +1,8 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import { cartService } from '../services/cartService';
+import { orderService } from '../services/orderService';
 import { getApiErrorMessage } from '../utils/apiError';
+import { useAuth } from '../hooks/useAuth';
 
 export const CartContext = createContext(null);
 
@@ -13,12 +15,20 @@ const mapCartItem = (item) => ({
 });
 
 export function CartProvider({ children }) {
+  const { isAuthenticated } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mutating, setMutating] = useState(false);
   const [error, setError] = useState('');
   const [placingOrder, setPlacingOrder] = useState(false);
 
-  const fetchCart = useCallback(async () => {
+  const refreshCart = useCallback(async () => {
+    if (!isAuthenticated) {
+      setCartItems([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -31,40 +41,79 @@ export function CartProvider({ children }) {
         setError('');
       } else {
         setError(getApiErrorMessage(err, 'Unable to load cart.'));
-        setCartItems([]);
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    refreshCart();
+  }, [refreshCart]);
 
-  const addToCart = useCallback(
-    async (product) => {
-      await cartService.addToCart({ productId: product.id, quantity: 1 });
-      await fetchCart();
+  const addItem = useCallback(
+    async (product, quantity = 1) => {
+      setMutating(true);
+      const optimisticItem = {
+        id: product.id,
+        productId: product.id,
+        imageUrl: product.imageUrl,
+        name: product.name,
+        price: product.price,
+        quantity,
+      };
+
+      setCartItems((prev) => {
+        const existing = prev.find((item) => item.id === product.id || item.productId === product.id);
+        if (!existing) {
+          return [...prev, optimisticItem];
+        }
+
+        return prev.map((item) =>
+          item.id === product.id || item.productId === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      });
+
+      try {
+        await cartService.addItem(product.id, quantity);
+      } catch (err) {
+        setError(getApiErrorMessage(err, 'Unable to add item to cart.'));
+        throw err;
+      } finally {
+        setMutating(false);
+        await refreshCart();
+      }
     },
-    [fetchCart]
+    [refreshCart]
   );
 
   const updateQuantity = useCallback(
     async (id, quantity) => {
       if (quantity < 1) return;
-      await cartService.updateItem(id, { quantity });
-      await fetchCart();
+      setMutating(true);
+      try {
+        await cartService.updateItem(id, quantity);
+      } finally {
+        setMutating(false);
+        await refreshCart();
+      }
     },
-    [fetchCart]
+    [refreshCart]
   );
 
   const removeItem = useCallback(
     async (id) => {
-      await cartService.removeItem(id);
-      await fetchCart();
+      setMutating(true);
+      try {
+        await cartService.removeItem(id);
+      } finally {
+        setMutating(false);
+        await refreshCart();
+      }
     },
-    [fetchCart]
+    [refreshCart]
   );
 
   const placeOrder = useCallback(async (payload) => {
@@ -72,7 +121,7 @@ export function CartProvider({ children }) {
     setError('');
 
     try {
-      const { data } = await cartService.placeOrder(payload);
+      const { data } = await orderService.placeOrder(payload);
       setCartItems([]);
       return data;
     } catch (err) {
@@ -81,8 +130,9 @@ export function CartProvider({ children }) {
       throw err;
     } finally {
       setPlacingOrder(false);
+      await refreshCart();
     }
-  }, []);
+  }, [refreshCart]);
 
   const cartCount = useMemo(() => cartItems.reduce((total, item) => total + item.quantity, 0), [cartItems]);
   const cartTotal = useMemo(
@@ -96,15 +146,16 @@ export function CartProvider({ children }) {
       cartCount,
       cartTotal,
       loading,
+      mutating,
       error,
       placingOrder,
-      addToCart,
+      addItem,
       updateQuantity,
       removeItem,
       placeOrder,
-      fetchCart,
+      refreshCart,
     }),
-    [cartItems, cartCount, cartTotal, loading, error, placingOrder, addToCart, updateQuantity, removeItem, placeOrder, fetchCart]
+    [cartItems, cartCount, cartTotal, loading, mutating, error, placingOrder, addItem, updateQuantity, removeItem, placeOrder, refreshCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

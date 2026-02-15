@@ -1,12 +1,28 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-import { authApi } from '../features/auth/api/authApi';
+import { authService } from '../services/authService';
 import { authStorage } from '../services/authStorage';
 
 export const AuthContext = createContext(null);
 
+const getSafeUser = (candidate) => {
+  if (!candidate || typeof candidate !== 'object') {
+    return null;
+  }
+
+  const id = candidate.id ?? candidate.userId ?? null;
+  const fullName = candidate.fullName ?? candidate.name ?? candidate.username ?? '';
+  const email = candidate.email ?? '';
+
+  return {
+    id,
+    fullName,
+    email,
+  };
+};
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => authStorage.getUser());
   const [token, setToken] = useState(() => authStorage.getToken());
+  const [user, setUser] = useState(() => getSafeUser(authStorage.getUser()));
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
@@ -17,30 +33,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const hydrateUser = useCallback(async () => {
+  useEffect(() => {
     const storedToken = authStorage.getToken();
+    const storedUser = getSafeUser(authStorage.getUser());
 
     if (!storedToken) {
+      logout();
       setInitializing(false);
       return;
     }
 
     setToken(storedToken);
-
-    try {
-      const profile = await authApi.me();
-      authStorage.setUser(profile);
-      setUser(profile);
-    } catch {
-      logout();
-    } finally {
-      setInitializing(false);
-    }
+    setUser(storedUser || authService.decodeUserFromToken(storedToken));
+    setInitializing(false);
   }, [logout]);
-
-  useEffect(() => {
-    hydrateUser();
-  }, [hydrateUser]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -49,7 +55,6 @@ export function AuthProvider({ children }) {
 
     const handleForcedLogout = () => {
       logout();
-      setInitializing(false);
     };
 
     window.addEventListener('auth:logout', handleForcedLogout);
@@ -57,34 +62,27 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   const login = useCallback(async (credentials) => {
+    if (loading) {
+      return null;
+    }
+
     setLoading(true);
-
     try {
-      const data = await authApi.login(credentials);
-      const resolvedToken = data?.token ?? data?.accessToken ?? data?.jwt ?? null;
-
-      authStorage.setToken(resolvedToken);
-      setToken(resolvedToken);
-
-      if (!resolvedToken) {
-        throw new Error('Missing token from login response.');
-      }
-
-      const profile = await authApi.me();
-      authStorage.setUser(profile);
-      setUser(profile);
-
-      return { ...data, user: profile };
+      const { token: nextToken, user: nextUser } = await authService.login(credentials);
+      authStorage.setToken(nextToken);
+      authStorage.setUser(nextUser);
+      setToken(nextToken);
+      setUser(getSafeUser(nextUser));
+      return { token: nextToken, user: nextUser };
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loading]);
 
   const signup = useCallback(async (payload) => {
     setLoading(true);
-
     try {
-      return await authApi.register(payload);
+      return await authService.register(payload);
     } finally {
       setLoading(false);
     }
@@ -92,17 +90,16 @@ export function AuthProvider({ children }) {
 
   const value = useMemo(
     () => ({
-      login,
-      logout,
-      signup,
-      refreshUser: hydrateUser,
-      isAuthenticated: () => Boolean(token),
       user,
       token,
       loading,
       initializing,
+      isAuthenticated: Boolean(token),
+      login,
+      logout,
+      signup,
     }),
-    [token, user, loading, initializing, login, logout, signup, hydrateUser]
+    [user, token, loading, initializing, login, logout, signup]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
