@@ -5,6 +5,7 @@ import { useCart } from '../features/cart/hooks/useCart';
 import { useProducts } from '../features/products/hooks/useProducts';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ErrorState } from '../components/ErrorState';
+import { Hero } from '../features/home/components/Hero';
 
 export function HomePage() {
   const { addToCart } = useCart();
@@ -12,27 +13,7 @@ export function HomePage() {
 
   return (
     <div className="space-y-16">
-      <section className="grid gap-8 rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top,#33271a,transparent_60%)] p-8 md:grid-cols-2 md:p-12">
-        <div className="space-y-5 self-center animate-fadeInUp">
-          <p className="text-sm uppercase tracking-[0.2em] text-leather-accent">Premium Craftsmanship</p>
-          <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">Leather essentials made for a lifetime.</h1>
-          <p className="max-w-md text-stone-300">
-            Discover handcrafted bags, wallets, and apparel designed with precision, heritage, and timeless elegance.
-          </p>
-          <div className="flex gap-3">
-            <Link to="/products">
-              <Button>Shop Collection</Button>
-            </Link>
-            <Button variant="outline">Our Story</Button>
-          </div>
-        </div>
-        <img
-          className="h-80 w-full rounded-2xl object-cover shadow-premium"
-          src="https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?auto=format&fit=crop&w=1200&q=80"
-          alt="Leathric premium collection"
-          loading="lazy"
-        />
-      </section>
+      <Hero />
 
       <section>
         <div className="mb-6 flex items-end justify-between">
