@@ -14,12 +14,14 @@ export function AuthProvider({ children }) {
 
     try {
       const data = await authApi.login(credentials);
+      const resolvedToken = data?.token ?? data?.accessToken ?? data?.jwt ?? null;
+      const resolvedUser = data?.user ?? null;
 
-      authStorage.setToken(data?.token);
-      authStorage.setUser(data?.user);
+      authStorage.setToken(resolvedToken);
+      authStorage.setUser(resolvedUser);
 
-      setToken(data?.token ?? null);
-      setUser(data?.user ?? null);
+      setToken(resolvedToken);
+      setUser(resolvedUser);
 
       return data;
     } finally {
