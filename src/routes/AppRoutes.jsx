@@ -36,8 +36,22 @@ export function AppRoutes() {
           <Route index element={<HomePage />} />
           <Route path="products" element={<ShopPage />} />
           <Route path="products/:id" element={<ProductDetailsPage />} />
-          <Route path="cart" element={<CartPage />} />
-          <Route path="checkout" element={<CheckoutPage />} />
+          <Route
+            path="cart"
+            element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="checkout"
+            element={
+              <ProtectedRoute>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="shipping" element={<ShippingPage />} />
           <Route path="warranty" element={<WarrantyPage />} />
           <Route path="contact" element={<ContactPage />} />

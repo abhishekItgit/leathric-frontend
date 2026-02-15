@@ -5,6 +5,10 @@ export const authApi = {
     const { data } = await axiosClient.post('/auth/login', payload);
     return data;
   },
+  async me() {
+    const { data } = await axiosClient.get('/auth/me');
+    return data;
+  },
   async register(payload) {
     const { data } = await axiosClient.post('/auth/register', payload);
     return data;

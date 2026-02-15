@@ -47,6 +47,9 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401 || error.response?.status === 403) {
       authToken.clearToken();
       authToken.clearUser();
+      if (isBrowser) {
+        window.dispatchEvent(new Event('auth:logout'));
+      }
       redirectToSignIn();
     }
 

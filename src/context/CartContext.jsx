@@ -1,5 +1,4 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-import { authStorage } from '../services/authStorage';
 import { cartService } from '../services/cartService';
 import { getApiErrorMessage } from '../utils/apiError';
 
@@ -17,17 +16,9 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [placingOrder, setPlacingOrder] = useState(false);
 
   const fetchCart = useCallback(async () => {
-    const token = authStorage.getToken();
-
-    if (!token) {
-      setCartItems([]);
-      setError('');
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
     setError('');
 
@@ -35,8 +26,13 @@ export function CartProvider({ children }) {
       const { data } = await cartService.getCart();
       setCartItems((data.items || []).map(mapCartItem));
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Unable to load cart.'));
-      setCartItems([]);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setCartItems([]);
+        setError('');
+      } else {
+        setError(getApiErrorMessage(err, 'Unable to load cart.'));
+        setCartItems([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -71,6 +67,23 @@ export function CartProvider({ children }) {
     [fetchCart]
   );
 
+  const placeOrder = useCallback(async (payload) => {
+    setPlacingOrder(true);
+    setError('');
+
+    try {
+      const { data } = await cartService.placeOrder(payload);
+      setCartItems([]);
+      return data;
+    } catch (err) {
+      const message = getApiErrorMessage(err, 'Unable to place order.');
+      setError(message);
+      throw err;
+    } finally {
+      setPlacingOrder(false);
+    }
+  }, []);
+
   const cartCount = useMemo(() => cartItems.reduce((total, item) => total + item.quantity, 0), [cartItems]);
   const cartTotal = useMemo(
     () => cartItems.reduce((total, item) => total + Number(item.price) * item.quantity, 0),
@@ -84,12 +97,14 @@ export function CartProvider({ children }) {
       cartTotal,
       loading,
       error,
+      placingOrder,
       addToCart,
       updateQuantity,
       removeItem,
+      placeOrder,
       fetchCart,
     }),
-    [cartItems, cartCount, cartTotal, loading, error, addToCart, updateQuantity, removeItem, fetchCart]
+    [cartItems, cartCount, cartTotal, loading, error, placingOrder, addToCart, updateQuantity, removeItem, placeOrder, fetchCart]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

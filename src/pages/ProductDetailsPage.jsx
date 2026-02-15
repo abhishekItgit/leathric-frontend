@@ -4,22 +4,23 @@ import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ErrorState } from '../components/ErrorState';
 import { useCart } from '../features/cart/hooks/useCart';
 import { useProduct } from '../features/products/hooks/useProducts';
-import { requireAuth } from '../utils/requireAuth';
+import { useAuth } from '../hooks/useAuth';
 
 export function ProductDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const { product, loading, error, refetch } = useProduct(id);
 
   const handleAddToCart = async () => {
-    const redirectPath = `/products/${id}`;
-
-    if (!requireAuth(navigate, redirectPath)) {
+    if (!isAuthenticated()) {
+      navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
 
     await addToCart(product);
+    navigate('/cart');
   };
 
   if (loading) return <LoadingSkeleton className="h-[460px]" />;
