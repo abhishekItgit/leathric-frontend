@@ -1,22 +1,26 @@
 import { createContext, useMemo, useState } from 'react';
 import { authApi } from '../features/auth/api/authApi';
-import { authToken } from '../lib/authToken';
+import { authStorage } from '../services/authStorage';
 
 export const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => authToken.getToken());
-  const [user, setUser] = useState(() => authToken.getUser());
+  const [user, setUser] = useState(() => authStorage.getUser());
+  const [token, setToken] = useState(() => authStorage.getToken());
   const [loading, setLoading] = useState(false);
 
   const login = async (credentials) => {
     setLoading(true);
+
     try {
       const data = await authApi.login(credentials);
-      authToken.setToken(data.token, { persist: true });
-      authToken.setUser(data.user, { persist: true });
-      setToken(data.token);
-      setUser(data.user);
+
+      authStorage.setToken(data?.token);
+      authStorage.setUser(data?.user);
+
+      setToken(data?.token ?? null);
+      setUser(data?.user ?? null);
+
       return data;
     } finally {
       setLoading(false);
@@ -25,6 +29,7 @@ export function AuthProvider({ children }) {
 
   const signup = async (payload) => {
     setLoading(true);
+
     try {
       return await authApi.register(payload);
     } finally {
@@ -33,14 +38,22 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    authToken.clearToken();
-    authToken.clearUser();
+    authStorage.removeToken();
+    authStorage.removeUser();
     setToken(null);
     setUser(null);
   };
 
   const value = useMemo(
-    () => ({ token, user, loading, login, signup, logout, isAuthenticated: Boolean(token) }),
+    () => ({
+      login,
+      logout,
+      signup,
+      isAuthenticated: Boolean(token),
+      user,
+      token,
+      loading,
+    }),
     [token, user, loading]
   );
 

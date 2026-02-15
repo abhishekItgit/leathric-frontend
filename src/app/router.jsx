@@ -38,7 +38,8 @@ export function AppRouter() {
             }
           />
         </Route>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signin" element={<LoginPage />} />
+        <Route path="/login" element={<Navigate to="/signin" replace />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
