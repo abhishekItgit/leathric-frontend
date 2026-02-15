@@ -1,5 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
-import { cartApi } from '../features/cart/api/cartApi';
+import { authStorage } from '../services/authStorage';
+import { cartService } from '../services/cartService';
+import { getApiErrorMessage } from '../utils/apiError';
 
 export const CartContext = createContext(null);
 
@@ -17,13 +19,23 @@ export function CartProvider({ children }) {
   const [error, setError] = useState('');
 
   const fetchCart = useCallback(async () => {
+    const token = authStorage.getToken();
+
+    if (!token) {
+      setCartItems([]);
+      setError('');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError('');
+
     try {
-      const { data } = await cartApi.getCart();
+      const { data } = await cartService.getCart();
       setCartItems((data.items || []).map(mapCartItem));
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to load cart.');
+      setError(getApiErrorMessage(err, 'Unable to load cart.'));
       setCartItems([]);
     } finally {
       setLoading(false);
@@ -34,26 +46,32 @@ export function CartProvider({ children }) {
     fetchCart();
   }, [fetchCart]);
 
-  const addToCart = useCallback(async (product) => {
-    await cartApi.addToCart({ productId: product.id, quantity: 1 });
-    await fetchCart();
-  }, [fetchCart]);
-
-  const updateQuantity = useCallback(async (id, quantity) => {
-    if (quantity < 1) return;
-    await cartApi.updateItem(id, { quantity });
-    await fetchCart();
-  }, [fetchCart]);
-
-  const removeItem = useCallback(async (id) => {
-    await cartApi.removeItem(id);
-    await fetchCart();
-  }, [fetchCart]);
-
-  const cartCount = useMemo(
-    () => cartItems.reduce((total, item) => total + item.quantity, 0),
-    [cartItems]
+  const addToCart = useCallback(
+    async (product) => {
+      await cartService.addToCart({ productId: product.id, quantity: 1 });
+      await fetchCart();
+    },
+    [fetchCart]
   );
+
+  const updateQuantity = useCallback(
+    async (id, quantity) => {
+      if (quantity < 1) return;
+      await cartService.updateItem(id, { quantity });
+      await fetchCart();
+    },
+    [fetchCart]
+  );
+
+  const removeItem = useCallback(
+    async (id) => {
+      await cartService.removeItem(id);
+      await fetchCart();
+    },
+    [fetchCart]
+  );
+
+  const cartCount = useMemo(() => cartItems.reduce((total, item) => total + item.quantity, 0), [cartItems]);
   const cartTotal = useMemo(
     () => cartItems.reduce((total, item) => total + Number(item.price) * item.quantity, 0),
     [cartItems]

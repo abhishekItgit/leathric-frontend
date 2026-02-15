@@ -11,6 +11,23 @@ export const axiosClient = axios.create({
   },
 });
 
+const isBrowser = typeof window !== 'undefined';
+
+function redirectToSignIn() {
+  if (!isBrowser) {
+    return;
+  }
+
+  const { pathname, search } = window.location;
+  const currentPath = `${pathname}${search}`;
+  const signinPath = pathname === '/signin' ? '/signin' : `/signin?redirect=${encodeURIComponent(currentPath)}`;
+
+  if (window.location.pathname !== '/signin') {
+    window.history.replaceState({}, '', signinPath);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+}
+
 axiosClient.interceptors.request.use(
   (config) => {
     const token = authToken.getToken();
@@ -27,9 +44,10 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 || error.response?.status === 403) {
       authToken.clearToken();
       authToken.clearUser();
+      redirectToSignIn();
     }
 
     return Promise.reject(error);

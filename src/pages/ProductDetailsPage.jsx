@@ -1,14 +1,26 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 import { ErrorState } from '../components/ErrorState';
 import { useCart } from '../features/cart/hooks/useCart';
 import { useProduct } from '../features/products/hooks/useProducts';
+import { requireAuth } from '../utils/requireAuth';
 
 export function ProductDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { addToCart } = useCart();
   const { product, loading, error, refetch } = useProduct(id);
+
+  const handleAddToCart = async () => {
+    const redirectPath = `/products/${id}`;
+
+    if (!requireAuth(navigate, redirectPath)) {
+      return;
+    }
+
+    await addToCart(product);
+  };
 
   if (loading) return <LoadingSkeleton className="h-[460px]" />;
   if (error) return <ErrorState message={error} onRetry={refetch} />;
@@ -29,7 +41,7 @@ export function ProductDetailsPage() {
         <h1 className="text-4xl font-bold">{product.name}</h1>
         <p className="text-2xl font-semibold text-leather-accent">${product.price}</p>
         <p className="text-stone-300">{product.description}</p>
-        <Button onClick={() => addToCart(product)}>Add to cart</Button>
+        <Button onClick={handleAddToCart}>Add to cart</Button>
       </div>
     </section>
   );
