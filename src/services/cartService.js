@@ -5,4 +5,5 @@ export const cartService = {
   addToCart: (payload) => axiosClient.post('/cart', payload),
   updateItem: (id, payload) => axiosClient.patch(`/cart/${id}`, payload),
   removeItem: (id) => axiosClient.delete(`/cart/${id}`),
+  placeOrder: (payload) => axiosClient.post('/orders', payload),
 };

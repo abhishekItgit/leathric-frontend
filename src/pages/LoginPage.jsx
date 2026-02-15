@@ -3,12 +3,14 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { useAuth } from '../hooks/useAuth';
+import { useCart } from '../hooks/useCart';
 import { getApiErrorMessage } from '../utils/apiError';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, loading } = useAuth();
+  const { fetchCart } = useCart();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
@@ -18,6 +20,7 @@ export function LoginPage() {
 
     try {
       await login(form);
+      await fetchCart();
       const redirect = new URLSearchParams(location.search).get('redirect');
       navigate(redirect || '/');
     } catch (err) {
