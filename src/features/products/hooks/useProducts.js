@@ -35,8 +35,20 @@ export function useProducts(params) {
           }))
         : [];
 
+      // Extract categories array from response
+      let categoriesArray = [];
+      if (Array.isArray(categoryData)) {
+        categoriesArray = categoryData;
+      } else if (categoryData?.data && Array.isArray(categoryData.data)) {
+        categoriesArray = categoryData.data;
+      } else if (categoryData?.categories && Array.isArray(categoryData.categories)) {
+        categoriesArray = categoryData.categories;
+      } else if (categoryData?.content && Array.isArray(categoryData.content)) {
+        categoriesArray = categoryData.content;
+      }
+
       setProducts(normalizedProducts);
-      setCategories(categoryData);
+      setCategories(categoriesArray);
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to load products right now.');
       setProducts([]);

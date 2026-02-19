@@ -24,4 +24,10 @@
     opacity: 0.25;
     pointer-events: none;
   }
+
+  /* Ensure caret is visible on dark background */
+  input, textarea, select {
+    caret-color: #EDEDED;
+    -webkit-text-fill-color: #EDEDED;
+  }
 }

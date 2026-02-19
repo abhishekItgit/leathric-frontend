@@ -1,12 +1,17 @@
 import { motion } from 'framer-motion';
 import { Hero } from '../components/Hero';
+import { CategoryNav } from '../components/CategoryNav';
 import { TrustStrip } from '../components/TrustStrip';
 import { ProductGrid } from '../components/ProductGrid';
+import { TrendingSection } from '../components/TrendingSection';
 import { BrandStory } from '../components/BrandStory';
 import { PremiumCTA } from '../components/PremiumCTA';
 import { AnimatedTitle } from '../../../components/ui/AnimatedTitle';
 import { SectionContainer } from '../../../components/ui/SectionContainer';
 import { AnimatedSection } from '../components/AnimatedSection';
+import { useCart } from '../../cart/hooks/useCart';
+import { useWishlist } from '../../../context/WishlistContext';
+import { useToast } from '../../../components/ui/Toast';
 
 const featuredCraftImages = [
   {
@@ -23,12 +28,41 @@ const featuredCraftImages = [
   },
 ];
 
-export function Home({ products, loading, error, refetch, onAddToCart }) {
+export function Home({ products, loading, error, refetch }) {
+  const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addToast } = useToast();
+
+  const handleAddToCart = async (product) => {
+    try {
+      await addToCart(product, 1);
+      addToast(`${product.name} added to cart!`, 'success');
+    } catch (err) {
+      addToast('Failed to add item to cart. Please try again.', 'error');
+    }
+  };
+
+  const handleWishlistToggle = async (productId) => {
+    try {
+      await toggleWishlist(productId);
+      addToast(
+        isInWishlist(productId) ? 'Removed from wishlist' : 'Added to wishlist',
+        'success'
+      );
+    } catch (err) {
+      addToast('Please log in to use wishlist', 'error');
+    }
+  };
+
   return (
     <div className="pb-10">
       <Hero />
       <TrustStrip />
 
+      {/* Category Navigation */}
+      <CategoryNav />
+
+      {/* Featured Craft Section */}
       <AnimatedSection className="pt-16">
         <SectionContainer>
           <div className="grid items-center gap-8 md:grid-cols-2">
@@ -57,8 +91,24 @@ export function Home({ products, loading, error, refetch, onAddToCart }) {
         </SectionContainer>
       </AnimatedSection>
 
-      <ProductGrid products={products} loading={loading} error={error} refetch={refetch} onAddToCart={onAddToCart} />
+      {/* Featured Products */}
+      <ProductGrid
+        products={products}
+        loading={loading}
+        error={error}
+        refetch={refetch}
+        onAddToCart={handleAddToCart}
+        onWishlistToggle={handleWishlistToggle}
+        isInWishlist={isInWishlist}
+      />
+
+      {/* Trending Products */}
+      <TrendingSection />
+
+      {/* Brand Story */}
       <BrandStory />
+
+      {/* Premium CTA */}
       <PremiumCTA />
     </div>
   );

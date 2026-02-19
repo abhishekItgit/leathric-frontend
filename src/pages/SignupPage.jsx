@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 export function SignupPage() {
   const navigate = useNavigate();
   const { signup, loading } = useAuth();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ fullName: '', email: '', password: '' });
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -27,7 +27,7 @@ export function SignupPage() {
     <main className="flex min-h-screen items-center justify-center px-4">
       <form onSubmit={onSubmit} className="panel w-full max-w-md space-y-5 p-8">
         <h1 className="text-3xl font-bold">Create account</h1>
-        <Input label="Name" required value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} />
+        <Input label="fullName" required value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, fullName: e.target.value }))} />
         <Input label="Email" type="email" required value={form.email} onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))} />
         <Input label="Password" type="password" required value={form.password} onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))} />
         {message && <p className="text-sm text-emerald-400">{message}</p>}

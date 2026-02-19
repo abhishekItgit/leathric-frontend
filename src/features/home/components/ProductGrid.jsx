@@ -5,7 +5,15 @@ import { ErrorState } from '../../../components/ErrorState';
 import { AnimatedTitle } from '../../../components/ui/AnimatedTitle';
 import { SectionContainer } from '../../../components/ui/SectionContainer';
 
-export function ProductGrid({ products, loading, error, refetch, onAddToCart }) {
+export function ProductGrid({
+  products,
+  loading,
+  error,
+  refetch,
+  onAddToCart,
+  onWishlistToggle,
+  isInWishlist,
+}) {
   return (
     <SectionContainer className="pt-16">
       <AnimatedTitle
@@ -34,8 +42,16 @@ export function ProductGrid({ products, loading, error, refetch, onAddToCart }) 
             className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
           >
             {products.slice(0, 6).map((product) => (
-              <motion.div key={product.id} variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}>
-                <ProductCard product={product} onAddToCart={onAddToCart} />
+              <motion.div
+                key={product.id}
+                variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0 } }}
+              >
+                <ProductCard
+                  product={product}
+                  onAddToCart={onAddToCart}
+                  onWishlistToggle={onWishlistToggle}
+                  isInWishlist={isInWishlist?.(product.id) || false}
+                />
               </motion.div>
             ))}
           </motion.div>
