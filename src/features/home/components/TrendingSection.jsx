@@ -99,7 +99,7 @@ export function TrendingSection() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 rounded-full border-2 border-leather-accent text-leather-accent font-semibold hover:bg-leather-accent/10 transition"
+              className="rounded-lg border border-leather-700/30 bg-white/70 px-8 py-3 font-semibold tracking-wide text-leather-900 transition hover:border-leather-accent hover:text-leather-accent"
             >
               View All Products →
             </motion.button>

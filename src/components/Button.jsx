@@ -9,12 +9,12 @@ export function Button({
   ...props
 }) {
   const base =
-    'rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-leather-900 disabled:opacity-50 disabled:cursor-not-allowed';
+    'rounded-lg px-5 py-2.5 text-sm font-semibold tracking-wide transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-leather-cream disabled:cursor-not-allowed disabled:opacity-50';
 
   const variants = {
-    primary: 'bg-leather-accent text-black hover:brightness-110 focus:ring-leather-accent disabled:hover:brightness-100',
-    secondary: 'border border-white/20 text-stone-100 hover:bg-white/10 focus:ring-white/20',
-    ghost: 'text-stone-300 hover:bg-white/10 focus:ring-white/20',
+    primary: 'bg-leather-950 text-leather-cream hover:bg-leather-accent hover:text-leather-950 focus:ring-leather-accent',
+    secondary: 'border border-leather-700/30 bg-white/70 text-leather-900 hover:border-leather-accent/70 hover:bg-white focus:ring-leather-700/30',
+    ghost: 'text-leather-900 hover:bg-leather-950/5 focus:ring-leather-700/20',
     danger: 'bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500/30 focus:ring-red-500/50',
   };
 

@@ -5,12 +5,14 @@ export default {
     extend: {
       colors: {
         leather: {
-          950: '#090909',
-          900: '#111111',
-          800: '#191919',
-          700: '#27221d',
-          600: '#3a3027',
-          accent: '#c49a6c',
+          950: '#0f172a',
+          900: '#1d2435',
+          800: '#2b3143',
+          700: '#3b2f2f',
+          600: '#5b4f4f',
+          accent: '#c9a86a',
+          cream: '#f9f7f3',
+          neutral: '#e5e7eb',
         },
       },
       boxShadow: {

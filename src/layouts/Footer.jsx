@@ -14,16 +14,16 @@ export function Footer() {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="border-t border-white/10 bg-black/40"
+      className="mt-14 border-t border-leather-700/20 bg-[#f3efe8]"
     >
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 text-sm text-stone-300 sm:grid-cols-2 lg:grid-cols-4 md:px-6">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 text-sm text-leather-900 sm:grid-cols-2 lg:grid-cols-4 md:px-6">
         <div>
           <img src={leathricHorseLogo} alt="Leathric horse logo" className="h-11 w-auto" loading="lazy" />
-          <p className="mt-3 max-w-xs">Authentic leather craftsmanship designed in India.</p>
+          <p className="mt-3 max-w-xs leading-relaxed">WalkEra · Step Into the New Era. Premium leather craftsmanship designed in India.</p>
         </div>
 
         <div>
-          <h5 className="font-semibold text-[#EDEDED]">Support</h5>
+          <h5 className="font-semibold uppercase tracking-[0.12em] text-leather-950">Support</h5>
           <ul className="mt-4 space-y-2">
             {[
               ['Shipping & Returns', '/shipping'],
@@ -33,7 +33,7 @@ export function Footer() {
               ['Terms & Conditions', '/terms'],
             ].map(([label, path]) => (
               <li key={path}>
-                <Link to={path} className="hover:text-[#C8A36A]">
+                <Link to={path} className="transition hover:text-leather-accent">
                   {label}
                 </Link>
               </li>
@@ -42,7 +42,7 @@ export function Footer() {
         </div>
 
         <div>
-          <h5 className="font-semibold text-[#EDEDED]">Contact</h5>
+          <h5 className="font-semibold uppercase tracking-[0.12em] text-leather-950">Contact</h5>
           <div className="mt-4 space-y-2">
             <p>Phone: 7068834066</p>
             <p>Email: mrabhishekdwivediit@gmail.com</p>
@@ -51,11 +51,11 @@ export function Footer() {
         </div>
 
         <div>
-          <h5 className="font-semibold text-[#EDEDED]">Social</h5>
+          <h5 className="font-semibold uppercase tracking-[0.12em] text-leather-950">Social</h5>
           <ul className="mt-4 space-y-2">
             {socialLinks.map((social) => (
               <li key={social.name}>
-                <a href={social.href} target="_blank" rel="noreferrer" className="hover:text-[#C8A36A]">
+                <a href={social.href} target="_blank" rel="noreferrer" className="transition hover:text-leather-accent">
                   {social.name}
                 </a>
               </li>
