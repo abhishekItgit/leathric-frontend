@@ -7,7 +7,7 @@ export function MainLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#0B0B0B] text-[#EDEDED]">
+    <div className="min-h-screen bg-leather-cream text-leather-950">
       <Header />
       <motion.main
         key={location.pathname}

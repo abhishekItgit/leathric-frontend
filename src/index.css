@@ -5,8 +5,16 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-leather-black: #0f172a;
+    --color-dark-brown: #3b2f2f;
+    --color-cream: #f9f7f3;
+    --color-gold: #c9a86a;
+    --color-neutral: #e5e7eb;
+  }
+
   body {
-    @apply bg-[#0B0B0B] text-[#EDEDED] antialiased;
+    @apply bg-[var(--color-cream)] text-[var(--color-leather-black)] antialiased;
   }
 
   a {
@@ -25,9 +33,8 @@
     pointer-events: none;
   }
 
-  /* Ensure caret is visible on dark background */
+  /* Ensure caret is visible on mixed backgrounds */
   input, textarea, select {
-    caret-color: #EDEDED;
-    -webkit-text-fill-color: #EDEDED;
+    caret-color: var(--color-leather-black);
   }
 }

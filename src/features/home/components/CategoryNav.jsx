@@ -43,7 +43,7 @@ export function CategoryNav() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="whitespace-nowrap px-6 py-3 rounded-full border-2 border-leather-accent bg-leather-accent/10 text-leather-accent font-semibold transition hover:bg-leather-accent/20"
+            className="whitespace-nowrap rounded-lg border border-leather-accent/70 bg-leather-accent/10 px-6 py-3 text-sm font-semibold tracking-wide text-leather-950 transition hover:bg-leather-accent hover:text-leather-950"
           >
             All Products
           </motion.button>
@@ -54,7 +54,7 @@ export function CategoryNav() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="whitespace-nowrap px-6 py-3 rounded-full border-2 border-white/20 text-white font-semibold transition hover:border-white/40 hover:bg-white/5"
+              className="whitespace-nowrap rounded-lg border border-leather-700/25 bg-white/65 px-6 py-3 text-sm font-semibold tracking-wide text-leather-900 transition hover:border-leather-accent/70 hover:text-leather-accent"
             >
               {cat}
             </motion.button>
