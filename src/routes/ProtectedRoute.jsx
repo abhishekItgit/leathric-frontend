@@ -1,18 +1,14 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { authStorage } from '../services/authStorage';
 
-export function ProtectedRoute({ children }) {
-  const { isAuthenticated, initializing } = useAuth();
+export function ProtectedRoute() {
   const location = useLocation();
+  const token = authStorage.getToken();
 
-  if (initializing) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
+  if (!token) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`/signin?redirect=${redirect}`} replace />;
   }
 
-  return children;
+  return <Outlet />;
 }
