@@ -1,45 +1,36 @@
 import axios from 'axios';
 import { authStorage } from '../services/authStorage';
 
-const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
-const baseURL = configuredBaseUrl || '/api';
+const isMeaningfulToken = (token) => {
+  if (typeof token !== 'string') {
+    return false;
+  }
+
+  const normalized = token.trim();
+  return normalized !== '' && normalized !== 'null' && normalized !== 'undefined';
+};
+
+const getValidToken = () => {
+  const token = authStorage.getToken();
+  return isMeaningfulToken(token) ? token.trim() : null;
+};
 
 export const axiosClient = axios.create({
-  baseURL,
+  baseURL: '/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-const isBrowser = typeof window !== 'undefined';
-
-function clearSessionAndRedirect() {
-  authStorage.removeToken();
-  authStorage.removeUser();
-
-  if (!isBrowser) {
-    return;
-  }
-
-  window.dispatchEvent(new Event('auth:logout'));
-
-  const { pathname, search } = window.location;
-  const currentPath = `${pathname}${search}`;
-  const signinPath = pathname === '/signin' ? '/signin' : `/signin?redirect=${encodeURIComponent(currentPath)}`;
-
-  if (window.location.pathname !== '/signin') {
-    window.history.replaceState({}, '', signinPath);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }
-}
-
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = authStorage.getToken();
+    const token = getValidToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else if (config.headers?.Authorization) {
+      delete config.headers.Authorization;
     }
 
     return config;
@@ -50,8 +41,16 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      clearSessionAndRedirect();
+    const status = error.response?.status;
+    const token = getValidToken();
+
+    if (token && (status === 401 || status === 403)) {
+      authStorage.removeToken();
+      authStorage.removeUser();
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth:logout'));
+      }
     }
 
     return Promise.reject(error);
