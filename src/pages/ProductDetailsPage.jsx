@@ -55,6 +55,7 @@ export function ProductDetailsPage() {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
+      addToast('Please login to use wishlist.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
@@ -70,6 +71,7 @@ export function ProductDetailsPage() {
 
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
+      addToast('Please login to use wishlist.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
@@ -81,12 +83,19 @@ export function ProductDetailsPage() {
         'success'
       );
     } catch (err) {
-      addToast('Failed to update wishlist', 'error');
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        addToast('Please login to use wishlist.', 'warning');
+        navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
+        return;
+      }
+
+      addToast(err?.response?.data?.message || 'Failed to update wishlist', 'error');
     }
   };
 
   const handleSubmitReview = async () => {
     if (!isAuthenticated) {
+      addToast('Please login to use wishlist.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }

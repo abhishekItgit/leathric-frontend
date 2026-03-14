@@ -8,7 +8,7 @@ import UpiInput from '../components/ui/UpiInput';
 import { useCart } from '../features/cart/hooks/useCart';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../components/ui/Toast';
-import { addressApi, orderApi } from '../services/apiServices';
+import { addressApi } from '../services/apiServices';
 import { LoadingSkeleton } from '../components/LoadingSkeleton';
 
 const steps = [
@@ -20,7 +20,7 @@ const steps = [
 
 export function CheckoutPage() {
   const navigate = useNavigate();
-  const { cartItems, cartTotal } = useCart();
+  const { cartItems, cartTotal, placeOrder, placingOrder, refreshCart } = useCart();
   const { user } = useAuth();
   const { addToast } = useToast();
 
@@ -44,7 +44,6 @@ export function CheckoutPage() {
   const [upiId, setUpiId] = useState('');
 
   const fmt = (v) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(v || 0);
-  console.debug('[CheckoutPage] render', { paymentMethod, upiId });
 
   // Stable callback so UpiInput doesn't remount when parent re-renders
   const handleUpiChange = useCallback((val) => {
@@ -127,44 +126,44 @@ export function CheckoutPage() {
         <form onSubmit={submit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Full Name</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required autoFocus value={name} onChange={(e) => setName(e.target.value)} />
+              <label className="form-label mb-2">Full Name</label>
+              <input className="form-input px-4 py-2" required autoFocus value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Phone</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <label className="form-label mb-2">Phone</label>
+              <input className="form-input px-4 py-2" required inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Address Line 1</label>
-            <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} />
+            <label className="form-label mb-2">Address Line 1</label>
+            <input className="form-input px-4 py-2" required value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Address Line 2</label>
-            <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} />
+            <label className="form-label mb-2">Address Line 2</label>
+            <input className="form-input px-4 py-2" value={addressLine2} onChange={(e) => setAddressLine2(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">City</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required value={city} onChange={(e) => setCity(e.target.value)} />
+              <label className="form-label mb-2">City</label>
+              <input className="form-input px-4 py-2" required value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">State</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required value={stateVal} onChange={(e) => setStateVal(e.target.value)} />
+              <label className="form-label mb-2">State</label>
+              <input className="form-input px-4 py-2" required value={stateVal} onChange={(e) => setStateVal(e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">ZIP Code</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
+              <label className="form-label mb-2">ZIP Code</label>
+              <input className="form-input px-4 py-2" required value={zipCode} onChange={(e) => setZipCode(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Country</label>
-              <input className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white" required value={country} onChange={(e) => setCountry(e.target.value)} />
+              <label className="form-label mb-2">Country</label>
+              <input className="form-input px-4 py-2" required value={country} onChange={(e) => setCountry(e.target.value)} />
             </div>
           </div>
 
@@ -178,6 +177,10 @@ export function CheckoutPage() {
   }
 
   const handlePlaceOrder = async () => {
+    if (loading || placingOrder) {
+      return;
+    }
+
     if (!selectedAddress) {
       addToast('Please select or add a shipping address', 'warning');
       return;
@@ -201,15 +204,12 @@ export function CheckoutPage() {
       if (paymentMethod === 'card') payload.cardDetails = paymentData;
       if (paymentMethod === 'upi') payload.upiId = upiId;
 
-      const order = await orderApi.createOrder(payload);
+      await placeOrder(payload);
+      await refreshCart();
 
       addToast('Order placed successfully!', 'success');
       setCurrentStep(3);
-
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate(`/dashboard`);
-      }, 2000);
+      navigate('/orders', { replace: true });
     } catch (err) {
       addToast(err.response?.data?.message || 'Failed to place order', 'error');
     } finally {
@@ -249,7 +249,7 @@ export function CheckoutPage() {
               {/* Saved Addresses */}
               {addresses.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-sm font-semibold text-stone-400">Your Addresses</p>
+                  <p className="text-sm font-semibold text-stone-700">Your Addresses</p>
                   <div className="space-y-3">
                     {addresses.map((addr) => (
                       <motion.button
@@ -259,14 +259,14 @@ export function CheckoutPage() {
                         className={`w-full text-left p-4 rounded-lg border-2 transition ${
                           selectedAddress === addr.id
                             ? 'border-leather-accent bg-leather-accent/10'
-                            : 'border-white/20 hover:border-white/40'
+                            : 'border-stone-300 hover:border-stone-400'
                         }`}
                       >
                         <p className="font-semibold">{addr.name}</p>
-                        <p className="text-sm text-stone-300 mt-1">
+                        <p className="text-sm text-stone-700 mt-1">
                           {addr.addressLine1}, {addr.city}, {addr.state} {addr.zipCode}
                         </p>
-                        <p className="text-xs text-stone-400 mt-1">📱 {addr.phone}</p>
+                        <p className="text-xs text-stone-600 mt-1">📱 {addr.phone}</p>
                       </motion.button>
                     ))}
                   </div>
@@ -324,66 +324,64 @@ export function CheckoutPage() {
             {paymentMethod === 'card' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Cardholder Name</label>
+                  <label className="form-label mb-2">Cardholder Name</label>
                   <input
                     type="text"
                     value={paymentData.cardName}
                     onChange={(e) => setPaymentData({ ...paymentData, cardName: e.target.value })}
                     placeholder="John Doe"
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500"
+                    className="form-input px-4 py-2"
                     required={paymentMethod === 'card'}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Card Number</label>
+                  <label className="form-label mb-2">Card Number</label>
                     <input
                       type="text"
                       value={paymentData.cardNumber}
-                      onChange={(e) => { console.debug('Card onChange', e.target.value); const val = e.target.value.replace(/\s/g, '').slice(0, 16); setPaymentData((s) => ({ ...s, cardNumber: val.replace(/(\d{4})/g, '$1 ').trim() })); }}
-                      onFocus={() => console.debug('Card onFocus')}
-                      onBlur={() => console.debug('Card onBlur')}
+                      onChange={(e) => { const val = e.target.value.replace(/\s/g, '').slice(0, 16); setPaymentData((state) => ({ ...state, cardNumber: val.replace(/(\d{4})/g, '$1 ').trim() })); }}
                     placeholder="4242 4242 4242 4242"
                     maxLength="19"
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500 font-mono"
+                    className="form-input px-4 py-2 font-mono"
                     required={paymentMethod === 'card'}
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">MM</label>
+                    <label className="form-label mb-2">MM</label>
                     <input
                       type="text"
                       value={paymentData.expiryMonth}
                       onChange={(e) => setPaymentData({ ...paymentData, expiryMonth: e.target.value.slice(0, 2) })}
                       placeholder="12"
                       maxLength="2"
-                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500"
+                      className="form-input px-4 py-2"
                       required={paymentMethod === 'card'}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">YY</label>
+                    <label className="form-label mb-2">YY</label>
                     <input
                       type="text"
                       value={paymentData.expiryYear}
                       onChange={(e) => setPaymentData({ ...paymentData, expiryYear: e.target.value.slice(0, 2) })}
                       placeholder="26"
                       maxLength="2"
-                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500"
+                      className="form-input px-4 py-2"
                       required={paymentMethod === 'card'}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">CVV</label>
+                    <label className="form-label mb-2">CVV</label>
                     <input
                       type="text"
                       value={paymentData.cvv}
                       onChange={(e) => setPaymentData({ ...paymentData, cvv: e.target.value.slice(0, 3) })}
                       placeholder="123"
                       maxLength="3"
-                      className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500"
+                      className="form-input px-4 py-2"
                       required={paymentMethod === 'card'}
                     />
                   </div>
@@ -393,7 +391,7 @@ export function CheckoutPage() {
 
             {paymentMethod === 'upi' && (
               <div>
-                <label className="block text-sm font-medium mb-2">UPI ID</label>
+                <label className="form-label mb-2">UPI ID</label>
                 <UpiInput value={upiId} onChange={handleUpiChange} placeholder="yourname@bank" />
                 <p className="text-sm text-stone-400 mt-2">You will be prompted to complete payment using your UPI app after placing the order.</p>
               </div>
@@ -492,7 +490,7 @@ export function CheckoutPage() {
             </Button>
             <Button
               onClick={handlePlaceOrder}
-              disabled={loading}
+              disabled={loading || placingOrder}
               className="flex-1"
             >
               {loading ? 'Placing Order...' : 'Place Order'}
