@@ -18,7 +18,7 @@ export function Footer() {
     >
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 text-sm text-leather-900 sm:grid-cols-2 lg:grid-cols-4 md:px-6">
         <div>
-          <img src={leathricHorseLogo} alt="Leathric horse logo" className="h-11 w-auto" loading="lazy" />
+          <img src={leathricHorseLogo} alt="Walk Era logo" className="h-11 w-auto" loading="lazy" />
           <p className="mt-3 max-w-xs leading-relaxed">WalkEra · Step Into the New Era. Premium leather craftsmanship designed in India.</p>
         </div>
 

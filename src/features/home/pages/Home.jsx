@@ -61,7 +61,13 @@ export function Home({ products, loading, error, refetch }) {
         'success'
       );
     } catch (err) {
-      addToast('Please log in to use wishlist', 'error');
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        addToast('Please login to continue.', 'warning');
+        navigate(`/signin?redirect=${encodeURIComponent(`${location.pathname}${location.search}`)}`);
+        return;
+      }
+
+      addToast(err?.response?.data?.message || 'Failed to update wishlist', 'error');
     }
   };
 

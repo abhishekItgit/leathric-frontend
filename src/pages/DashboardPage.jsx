@@ -145,7 +145,7 @@ export function DashboardPage() {
       <h1 className="text-3xl font-bold">My Account</h1>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/10 overflow-x-auto">
+      <div className="flex gap-2 border-b border-stone-200 overflow-x-auto">
         {tabs.map((tab) => (
           <motion.button
             key={tab.id}
@@ -154,7 +154,7 @@ export function DashboardPage() {
             className={`px-4 py-3 border-b-2 transition text-sm font-medium ${
               activeTab === tab.id
                 ? 'border-leather-accent text-leather-accent'
-                : 'border-transparent text-stone-400 hover:text-stone-200'
+                : 'border-transparent text-stone-600 hover:text-stone-800'
             }`}
           >
             {tab.label}
@@ -178,32 +178,32 @@ export function DashboardPage() {
 
               <form onSubmit={handleSaveProfile} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <label className="form-label mb-2">Full Name</label>
                   <input
                     type="text"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                    className="form-input px-4 py-2"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email (Read-only)</label>
+                  <label className="form-label mb-2">Email (Read-only)</label>
                   <input
                     type="email"
                     value={formData.email}
                     disabled
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-stone-400 cursor-not-allowed"
+                    className="form-input cursor-not-allowed bg-stone-100 text-stone-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Phone</label>
+                  <label className="form-label mb-2">Phone</label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                    className="form-input px-4 py-2"
                   />
                 </div>
 
@@ -213,7 +213,7 @@ export function DashboardPage() {
               </form>
 
               {/* Logout */}
-              <div className="border-t border-white/10 pt-6">
+              <div className="border-t border-stone-200 pt-6">
                 <Button variant="danger" onClick={handleLogout}>
                   Logout
                 </Button>
@@ -229,7 +229,7 @@ export function DashboardPage() {
               className="space-y-4"
             >
               {orders.length === 0 ? (
-                <div className="panel p-10 text-center text-stone-300">
+                <div className="panel p-10 text-center text-stone-700">
                   <p className="text-lg font-medium mb-2">No orders yet</p>
                   <p className="text-sm">Start shopping to place your first order!</p>
                 </div>
@@ -238,13 +238,13 @@ export function DashboardPage() {
                   <motion.div
                     key={order.orderId || order.id}
                     whileHover={{ y: -2 }}
-                    className="panel p-6 space-y-3 cursor-pointer hover:bg-white/5 transition"
+                    className="panel p-6 space-y-3 cursor-pointer hover:bg-stone-50 transition"
                     onClick={() => setShowOrderDetail(order)}
                   >
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="font-semibold">Order #{order.orderId || order.id}</p>
-                        <p className="text-sm text-stone-400">
+                        <p className="text-sm text-stone-600">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                       </div>
@@ -255,14 +255,14 @@ export function DashboardPage() {
                             ? 'bg-blue-500/20 text-blue-300'
                             : order.status === 'processing'
                               ? 'bg-amber-500/20 text-amber-300'
-                              : 'bg-stone-600/20 text-stone-300'
+                              : 'bg-stone-600/20 text-stone-700'
                       }`}>
                         {order.status?.toUpperCase()}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-stone-300">
+                      <p className="text-sm text-stone-700">
                         {order.items?.length || 0} item{order.items?.length !== 1 ? 's' : ''}
                       </p>
                       <p className="font-bold text-leather-accent">
@@ -287,7 +287,7 @@ export function DashboardPage() {
               </Button>
 
               {addresses.length === 0 ? (
-                <div className="panel p-10 text-center text-stone-300">
+                <div className="panel p-10 text-center text-stone-700">
                   <p className="text-lg font-medium mb-2">No addresses saved</p>
                   <p className="text-sm">Add your first address to get started</p>
                 </div>
@@ -300,15 +300,15 @@ export function DashboardPage() {
                       className="panel p-4 space-y-3"
                     >
                       <p className="font-semibold">{address.name}</p>
-                      <p className="text-sm text-stone-300">
+                      <p className="text-sm text-stone-700">
                         {address.addressLine1}<br />
                         {address.addressLine2 && <>{address.addressLine2}<br /></>}
                         {address.city}, {address.state} {address.zipCode}<br />
                         {address.country}
                       </p>
-                      <p className="text-xs text-stone-400">📱 {address.phone}</p>
+                      <p className="text-xs text-stone-600">📱 {address.phone}</p>
 
-                      <div className="flex gap-2 pt-3 border-t border-white/10">
+                      <div className="flex gap-2 pt-3 border-t border-stone-200">
                         <Button
                           variant="secondary"
                           onClick={() => handleDeleteAddress(address.id)}
@@ -332,7 +332,7 @@ export function DashboardPage() {
               className="space-y-4"
             >
               {wishlistItems.length === 0 ? (
-                <div className="panel p-10 text-center text-stone-300">
+                <div className="panel p-10 text-center text-stone-700">
                   <p className="text-lg font-medium mb-2">Your wishlist is empty</p>
                   <p className="text-sm">Start adding your favorite items!</p>
                 </div>
@@ -378,66 +378,66 @@ export function DashboardPage() {
       >
         <form onSubmit={handleAddAddress} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Full Name</label>
+            <label className="form-label mb-2">Full Name</label>
             <input
               type="text"
               value={addressForm.name}
               onChange={(e) => setAddressForm({ ...addressForm, name: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+              className="form-input px-4 py-2"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Phone</label>
+            <label className="form-label mb-2">Phone</label>
             <input
               type="tel"
               value={addressForm.phone}
               onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+              className="form-input px-4 py-2"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Address Line 1</label>
+            <label className="form-label mb-2">Address Line 1</label>
             <input
               type="text"
               value={addressForm.addressLine1}
               onChange={(e) => setAddressForm({ ...addressForm, addressLine1: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+              className="form-input px-4 py-2"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Address Line 2</label>
+            <label className="form-label mb-2">Address Line 2</label>
             <input
               type="text"
               value={addressForm.addressLine2}
               onChange={(e) => setAddressForm({ ...addressForm, addressLine2: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+              className="form-input px-4 py-2"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">City</label>
+              <label className="form-label mb-2">City</label>
               <input
                 type="text"
                 value={addressForm.city}
                 onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                className="form-input px-4 py-2"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">State</label>
+              <label className="form-label mb-2">State</label>
               <input
                 type="text"
                 value={addressForm.state}
                 onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                className="form-input px-4 py-2"
                 required
               />
             </div>
@@ -445,22 +445,22 @@ export function DashboardPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">ZIP Code</label>
+              <label className="form-label mb-2">ZIP Code</label>
               <input
                 type="text"
                 value={addressForm.zipCode}
                 onChange={(e) => setAddressForm({ ...addressForm, zipCode: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                className="form-input px-4 py-2"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Country</label>
+              <label className="form-label mb-2">Country</label>
               <input
                 type="text"
                 value={addressForm.country}
                 onChange={(e) => setAddressForm({ ...addressForm, country: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white"
+                className="form-input px-4 py-2"
                 required
               />
             </div>
@@ -486,35 +486,35 @@ export function DashboardPage() {
           size="lg"
         >
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 p-4 bg-white/5 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 p-4 bg-stone-50 rounded-lg">
               <div>
-                <p className="text-xs text-stone-400 uppercase">Status</p>
+                <p className="text-xs text-stone-600 uppercase">Status</p>
                 <p className="font-semibold text-lg">{showOrderDetail.status?.toUpperCase()}</p>
               </div>
               <div>
-                <p className="text-xs text-stone-400 uppercase">Total</p>
+                <p className="text-xs text-stone-600 uppercase">Total</p>
                 <p className="font-semibold text-leather-accent text-lg">
                   ₹{(showOrderDetail.totalAmount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-stone-400 uppercase">Order Date</p>
+                <p className="text-xs text-stone-600 uppercase">Order Date</p>
                 <p className="font-semibold text-sm">{new Date(showOrderDetail.createdAt).toLocaleDateString()}</p>
               </div>
               <div>
-                <p className="text-xs text-stone-400 uppercase">Payment Status</p>
+                <p className="text-xs text-stone-600 uppercase">Payment Status</p>
                 <p className="font-semibold text-sm">{showOrderDetail.paymentStatus || 'PENDING'}</p>
               </div>
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-stone-400 uppercase mb-3">Items</p>
+              <p className="text-sm font-semibold text-stone-600 uppercase mb-3">Items</p>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {showOrderDetail.items?.map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-sm p-3 bg-white/5 rounded">
+                  <div key={idx} className="flex items-center justify-between text-sm p-3 bg-stone-50 rounded">
                     <div className="flex-1">
-                      <p className="text-stone-200 font-medium">{item.productName || item.name || 'Product'}</p>
-                      <p className="text-xs text-stone-400">Qty: {item.quantity}</p>
+                      <p className="text-stone-800 font-medium">{item.productName || item.name || 'Product'}</p>
+                      <p className="text-xs text-stone-600">Qty: {item.quantity}</p>
                     </div>
                     <span className="text-leather-accent font-semibold">
                       ₹{((item.price || 0) * item.quantity).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -525,9 +525,9 @@ export function DashboardPage() {
             </div>
 
             {showOrderDetail.notes && (
-              <div className="p-3 bg-stone-900/50 rounded-lg">
-                <p className="text-xs text-stone-400 uppercase mb-1">Notes</p>
-                <p className="text-sm text-stone-300">{showOrderDetail.notes}</p>
+              <div className="p-3 bg-stone-50 rounded-lg">
+                <p className="text-xs text-stone-600 uppercase mb-1">Notes</p>
+                <p className="text-sm text-stone-700">{showOrderDetail.notes}</p>
               </div>
             )}
           </div>

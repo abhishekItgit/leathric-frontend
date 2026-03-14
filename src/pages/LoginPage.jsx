@@ -5,6 +5,19 @@ import { Input } from '../components/Input';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { getApiErrorMessage } from '../utils/apiError';
+import { useWishlist } from '../context/WishlistContext';
+
+const getSafeRedirect = (redirect) => {
+  if (!redirect || !redirect.startsWith('/')) {
+    return '/';
+  }
+
+  if (redirect.startsWith('//')) {
+    return '/';
+  }
+
+  return redirect;
+};
 
 const getSafeRedirect = (redirect) => {
   if (!redirect || !redirect.startsWith('/')) {
@@ -23,6 +36,7 @@ export function LoginPage() {
   const location = useLocation();
   const { login, loading } = useAuth();
   const { refreshCart } = useCart();
+  const { refreshWishlist } = useWishlist();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
