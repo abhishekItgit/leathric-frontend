@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
 import { Input } from '../../../components/Input';
 import { LoadingSkeleton } from '../../../components/LoadingSkeleton';
@@ -9,6 +10,7 @@ import { useCart } from '../../cart/hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
 import { useWishlist } from '../../../context/WishlistContext';
 import { useToast } from '../../../components/ui/Toast';
+import { useAuth } from '../../../hooks/useAuth';
 
 const pageSize = 12;
 
@@ -16,6 +18,9 @@ export function Shop() {
   const { addToCart } = useCart();
   const { products, categories, loading, error, refetch } = useProducts();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -85,6 +90,12 @@ export function Shop() {
   }, [searchQuery, selectedCategory, priceRange, selectedRating, sortBy]);
 
   const handleAddToCart = async (product) => {
+    if (!isAuthenticated) {
+      addToast('Please login to add items to cart.', 'warning');
+      navigate(`/signin?redirect=${encodeURIComponent(`${location.pathname}${location.search}`)}`);
+      return;
+    }
+
     try {
       await addToCart(product, 1);
       addToast(`${product.name} added to cart!`, 'success');
@@ -148,7 +159,7 @@ export function Shop() {
           {/* Sort and View Options */}
           <div className="panel p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-stone-400">
+              <span className="text-stone-600">
                 Showing {paginated.length > 0 ? (page - 1) * pageSize + 1 : 0} to{' '}
                 {Math.min(page * pageSize, filteredProducts.length)} of {filteredProducts.length} products
               </span>
@@ -159,7 +170,7 @@ export function Shop() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+                className="form-select rounded-lg px-3 py-2"
               >
                 <option value="featured">Featured</option>
                 <option value="newest">Newest</option>
@@ -182,7 +193,7 @@ export function Shop() {
           ) : (
             <>
               {!paginated.length ? (
-                <div className="panel p-8 text-center text-stone-300 min-h-96">
+                <div className="panel p-8 text-center text-stone-700 min-h-96">
                   <p className="text-lg font-medium mb-2">No products found</p>
                   <p className="text-sm">Try adjusting your filters or search query</p>
                 </div>

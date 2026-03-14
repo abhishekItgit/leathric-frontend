@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ProductCard } from '../../products/components/ProductCard';
 import { LoadingSkeleton } from '../../../components/LoadingSkeleton';
 import { AnimatedTitle } from '../../../components/ui/AnimatedTitle';
@@ -9,12 +9,16 @@ import { productApi } from '../../../services/productApiService';
 import { useWishlist } from '../../../context/WishlistContext';
 import { useCart } from '../../cart/hooks/useCart';
 import { useToast } from '../../../components/ui/Toast';
+import { useAuth } from '../../../hooks/useAuth';
 
 export function TrendingSection() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -33,6 +37,12 @@ export function TrendingSection() {
   }, []);
 
   const handleAddToCart = async (product) => {
+    if (!isAuthenticated) {
+      addToast('Please login to add items to cart.', 'warning');
+      navigate(`/signin?redirect=${encodeURIComponent(`${location.pathname}${location.search}`)}`);
+      return;
+    }
+
     try {
       await addToCart(product, 1);
       addToast(`${product.name} added to cart!`, 'success');
