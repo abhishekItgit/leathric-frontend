@@ -40,8 +40,8 @@ export function Header() {
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 md:px-6">
-        <Link to="/" className="inline-flex items-center" aria-label="Leathric Home">
-          <img src={leathricHorseLogo} alt="Leathric horse logo" className="h-10 w-auto md:h-11" loading="eager" />
+        <Link to="/" className="inline-flex items-center" aria-label="Walk Era Home">
+          <img src={leathricHorseLogo} alt="Walk Era logo" className="h-10 w-auto md:h-11" loading="eager" />
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">

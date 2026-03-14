@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { productApi } from '../api/productApi';
-import { axiosClient } from '../../../lib/axiosClient';
+import {
+  normalizeCategoryResponse,
+  normalizeProductResponse,
+  normalizeSingleProductResponse,
+} from '../../../utils/productMappers';
 
 export function useProducts(params) {
   const [products, setProducts] = useState([]);
@@ -15,40 +19,13 @@ export function useProducts(params) {
     setError('');
 
     try {
-      const [response, categoryData] = await Promise.all([
-        axiosClient.get('/products', { params: queryParams }),
+      const [productsResponse, categoryResponse] = await Promise.all([
+        productApi.getProducts(queryParams),
         productApi.getCategories(),
       ]);
 
-      console.log('API RESPONSE:', response.data);
-      const products = response?.data?.data?.content || [];
-      console.log('PRODUCT ARRAY:', products);
-
-      const normalizedProducts = Array.isArray(products)
-        ? products.map((product) => ({
-            ...product,
-            categoryName:
-              product?.categoryName ||
-              (typeof product?.category === 'string'
-                ? product.category
-                : product?.category?.name || product?.category?.title || ''),
-          }))
-        : [];
-
-      // Extract categories array from response
-      let categoriesArray = [];
-      if (Array.isArray(categoryData)) {
-        categoriesArray = categoryData;
-      } else if (categoryData?.data && Array.isArray(categoryData.data)) {
-        categoriesArray = categoryData.data;
-      } else if (categoryData?.categories && Array.isArray(categoryData.categories)) {
-        categoriesArray = categoryData.categories;
-      } else if (categoryData?.content && Array.isArray(categoryData.content)) {
-        categoriesArray = categoryData.content;
-      }
-
-      setProducts(normalizedProducts);
-      setCategories(categoriesArray);
+      setProducts(normalizeProductResponse(productsResponse));
+      setCategories(normalizeCategoryResponse(categoryResponse));
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to load products right now.');
       setProducts([]);
@@ -87,8 +64,8 @@ export function useProduct(id) {
     setError('');
 
     try {
-      const data = await productApi.getProductById(id);
-      setProduct(data);
+      const response = await productApi.getProductById(id);
+      setProduct(normalizeSingleProductResponse(response));
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to load product details.');
       setProduct(null);

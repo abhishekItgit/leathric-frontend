@@ -23,6 +23,10 @@
 }
 
 @layer components {
+  .panel {
+    @apply rounded-2xl border border-stone-200/80 bg-white shadow-sm;
+  }
+
   .noise-bg::before {
     content: '';
     position: absolute;
@@ -33,8 +37,19 @@
     pointer-events: none;
   }
 
-  /* Ensure caret is visible on mixed backgrounds */
-  input, textarea, select {
+  .form-label {
+    @apply block text-sm font-medium text-stone-700;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-leather-accent focus:outline-none;
+  }
+
+  input,
+  textarea,
+  select {
     caret-color: var(--color-leather-black);
   }
 }
