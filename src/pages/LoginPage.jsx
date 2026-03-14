@@ -19,17 +19,7 @@ const getSafeRedirect = (redirect) => {
   return redirect;
 };
 
-const getSafeRedirect = (redirect) => {
-  if (!redirect || !redirect.startsWith('/')) {
-    return '/';
-  }
 
-  if (redirect.startsWith('//')) {
-    return '/';
-  }
-
-  return redirect;
-};
 
 export function LoginPage() {
   const navigate = useNavigate();
