@@ -7,7 +7,29 @@ import { useCart } from '../hooks/useCart';
 import { getApiErrorMessage } from '../utils/apiError';
 import { useWishlist } from '../context/WishlistContext';
 
-import { getSafeRedirect } from '../utils/navigation';
+const getSafeRedirect = (redirect) => {
+  if (!redirect || !redirect.startsWith('/')) {
+    return '/';
+  }
+
+  if (redirect.startsWith('//')) {
+    return '/';
+  }
+
+  return redirect;
+};
+
+const getSafeRedirect = (redirect) => {
+  if (!redirect || !redirect.startsWith('/')) {
+    return '/';
+  }
+
+  if (redirect.startsWith('//')) {
+    return '/';
+  }
+
+  return redirect;
+};
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -29,7 +51,7 @@ export function LoginPage() {
 
     try {
       await login(form);
-      await Promise.all([refreshCart(), refreshWishlist()]);
+      await refreshCart();
       const redirect = getSafeRedirect(new URLSearchParams(location.search).get('redirect'));
       navigate(redirect, { replace: true });
     } catch (err) {

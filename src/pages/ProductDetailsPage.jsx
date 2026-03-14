@@ -55,7 +55,7 @@ export function ProductDetailsPage() {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      addToast('Please login to use wishlist.', 'warning');
+      addToast('Please login to add items to cart.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
@@ -71,7 +71,7 @@ export function ProductDetailsPage() {
 
   const handleWishlistToggle = async () => {
     if (!isAuthenticated) {
-      addToast('Please login to use wishlist.', 'warning');
+      addToast('Please login to add items to cart.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
@@ -95,7 +95,7 @@ export function ProductDetailsPage() {
 
   const handleSubmitReview = async () => {
     if (!isAuthenticated) {
-      addToast('Please login to use wishlist.', 'warning');
+      addToast('Please login to add items to cart.', 'warning');
       navigate(`/signin?redirect=${encodeURIComponent(`/products/${id}`)}`);
       return;
     }
