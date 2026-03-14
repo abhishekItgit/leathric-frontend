@@ -85,7 +85,7 @@ export function CartPage() {
       >
         <div className="text-6xl">🛒</div>
         <h2 className="text-2xl font-bold">Your cart is empty</h2>
-        <p className="text-stone-400">Browse our collection and add some beautiful leather products!</p>
+        <p className="text-stone-600">Browse our collection and add some beautiful leather products!</p>
         <Link to="/products">
           <Button>Continue Shopping</Button>
         </Link>
@@ -107,7 +107,7 @@ export function CartPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className="panel flex items-center gap-4 p-4 hover:bg-white/5 transition"
+              className="panel flex items-center gap-4 p-4 hover:bg-white transition"
             >
               {/* Image */}
               <img
@@ -119,21 +119,21 @@ export function CartPage() {
               {/* Product Info */}
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold truncate">{item.name}</h3>
-                <p className="text-sm text-stone-300 mt-1">
+                <p className="text-sm text-stone-700 mt-1">
                   {fmt(item.price)} each
                 </p>
                 {item.variant && (
-                  <p className="text-xs text-stone-400 mt-1">Variant: {item.variant}</p>
+                  <p className="text-xs text-stone-600 mt-1">Variant: {item.variant}</p>
                 )}
               </div>
 
               {/* Quantity Control */}
-              <div className="flex items-center gap-2 border border-white/20 rounded-lg p-1">
+              <div className="flex items-center gap-2 border border-stone-300 rounded-lg p-1">
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                  className="h-8 w-8 flex items-center justify-center hover:bg-white/10 rounded"
+                  className="h-8 w-8 flex items-center justify-center hover:bg-stone-100 rounded"
                 >
                   −
                 </motion.button>
@@ -144,7 +144,7 @@ export function CartPage() {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="h-8 w-8 flex items-center justify-center hover:bg-white/10 rounded"
+                  className="h-8 w-8 flex items-center justify-center hover:bg-stone-100 rounded"
                 >
                   +
                 </motion.button>
@@ -189,8 +189,8 @@ export function CartPage() {
           <h3 className="text-lg font-semibold">Order Summary</h3>
 
           {/* Price Breakdown */}
-          <div className="space-y-2 text-sm border-b border-white/10 pb-4">
-            <div className="flex justify-between text-stone-300">
+          <div className="space-y-2 text-sm border-b border-stone-200 pb-4">
+            <div className="flex justify-between text-stone-700">
               <span>Subtotal</span>
               <span>{fmt(cartTotal)}</span>
             </div>
@@ -202,13 +202,13 @@ export function CartPage() {
               </div>
             )}
 
-            <div className="flex justify-between text-stone-300">
+            <div className="flex justify-between text-stone-700">
               <span>Tax (10%)</span>
               <span>{fmt(tax)}</span>
             </div>
 
             {/* Shipping */}
-            <div className="flex justify-between text-stone-300">
+            <div className="flex justify-between text-stone-700">
               <span>Shipping</span>
               <span className="text-green-400">Free</span>
             </div>
@@ -221,7 +221,7 @@ export function CartPage() {
             </div>
 
           {/* Coupon Section */}
-          <div className="border-t border-white/10 pt-4 space-y-2">
+          <div className="border-t border-stone-200 pt-4 space-y-2">
             {appliedCoupon ? (
               <motion.div
                 initial={{ opacity: 0 }}
@@ -260,7 +260,7 @@ export function CartPage() {
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                       placeholder="Enter code"
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500 text-sm"
+                      className="w-full px-3 py-2 rounded-lg bg-white border border-stone-300 text-white placeholder-stone-500 text-sm"
                     />
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -283,7 +283,7 @@ export function CartPage() {
           </Link>
 
           {/* Security Badge */}
-          <div className="text-center text-xs text-stone-400 pt-2 border-t border-white/10">
+          <div className="text-center text-xs text-stone-600 pt-2 border-t border-stone-200">
             🔒 Secure checkout powered by Stripe
           </div>
         </motion.div>
@@ -297,13 +297,13 @@ export function CartPage() {
         size="sm"
       >
         <div className="space-y-4">
-          <p className="text-sm text-stone-300">Enter your coupon code to get a discount</p>
+          <p className="text-sm text-stone-700">Enter your coupon code to get a discount</p>
           <input
             type="text"
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
             placeholder="SUMMER20"
-            className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/20 text-white placeholder-stone-500"
+            className="w-full px-4 py-2 rounded-lg bg-white border border-stone-300 text-white placeholder-stone-500"
           />
         </div>
       </Modal>

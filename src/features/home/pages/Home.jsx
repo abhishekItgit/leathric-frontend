@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Hero } from '../components/Hero';
 import { CategoryNav } from '../components/CategoryNav';
 import { TrustStrip } from '../components/TrustStrip';
@@ -12,6 +13,7 @@ import { AnimatedSection } from '../components/AnimatedSection';
 import { useCart } from '../../cart/hooks/useCart';
 import { useWishlist } from '../../../context/WishlistContext';
 import { useToast } from '../../../components/ui/Toast';
+import { useAuth } from '../../../hooks/useAuth';
 
 const featuredCraftImages = [
   {
@@ -31,9 +33,18 @@ const featuredCraftImages = [
 export function Home({ products, loading, error, refetch }) {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
 
   const handleAddToCart = async (product) => {
+    if (!isAuthenticated) {
+      addToast('Please login to add items to cart.', 'warning');
+      navigate(`/signin?redirect=${encodeURIComponent(`${location.pathname}${location.search}`)}`);
+      return;
+    }
+
     try {
       await addToCart(product, 1);
       addToast(`${product.name} added to cart!`, 'success');
