@@ -19,6 +19,18 @@ const getSafeRedirect = (redirect) => {
   return redirect;
 };
 
+const getSafeRedirect = (redirect) => {
+  if (!redirect || !redirect.startsWith('/')) {
+    return '/';
+  }
+
+  if (redirect.startsWith('//')) {
+    return '/';
+  }
+
+  return redirect;
+};
+
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,7 +51,7 @@ export function LoginPage() {
 
     try {
       await login(form);
-      await Promise.all([refreshCart(), refreshWishlist()]);
+      await refreshCart();
       const redirect = getSafeRedirect(new URLSearchParams(location.search).get('redirect'));
       navigate(redirect, { replace: true });
     } catch (err) {
