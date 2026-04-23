@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,10 +11,32 @@
     --color-cream: #f9f7f3;
     --color-gold: #c9a86a;
     --color-neutral: #e5e7eb;
+    --color-charcoal: #1d1914;
+    --color-warm-white: #fffdf8;
   }
 
   body {
     @apply bg-[var(--color-cream)] text-[var(--color-leather-black)] antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Cormorant Garamond', serif;
+    letter-spacing: 0.01em;
+  }
+
+  p,
+  span,
+  button,
+  a,
+  li,
+  label,
+  input,
+  textarea,
+  select {
+    font-family: 'Inter', system-ui, sans-serif;
   }
 
   a {
@@ -25,6 +47,10 @@
 @layer components {
   .panel {
     @apply rounded-2xl border border-stone-200/80 bg-white shadow-sm;
+  }
+
+  .premium-surface {
+    background: linear-gradient(135deg, #f7efe3 0%, #fdf9f1 40%, #f2e7d4 100%);
   }
 
   .noise-bg::before {
